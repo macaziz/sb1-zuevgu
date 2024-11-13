@@ -1,0 +1,7 @@
+<content>User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /my-list
+
+Sitemap: https://animeflow.com/sitemap.xml</content>
