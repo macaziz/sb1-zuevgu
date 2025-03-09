@@ -1,19 +1,46 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Play, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { AnimeDetails } from '@/types/tmdb';
 import WatchlistButton from './WatchlistButton';
 import EpisodeCountdown from './EpisodeCountdown';
+import { useAnimeLinks } from '@/hooks/useAnimeLinks';
 
 interface AnimeDetailProps {
   anime: AnimeDetails;
 }
 
+interface VideoModalProps {
+  url: string;
+  onClose: () => void;
+}
+
+const VideoModal = ({ url, onClose }: VideoModalProps) => (
+  <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+    <div className="relative w-full max-w-5xl aspect-video">
+      <button
+        onClick={onClose}
+        className="absolute -top-10 right-0 text-white hover:text-gray-300 flex items-center"
+      >
+        <X className="w-6 h-6 mr-2" />
+        Fermer
+      </button>
+      <iframe
+        src={url}
+        className="w-full h-full rounded-lg"
+        allowFullScreen
+      />
+    </div>
+  </div>
+);
+
 export default function AnimeDetail({ anime }: AnimeDetailProps) {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const { links, isLoading: linksLoading } = useAnimeLinks(anime.id);
 
   const currentSeason = anime.seasons.find(season => season.id === selectedSeason);
 
@@ -23,7 +50,7 @@ export default function AnimeDetail({ anime }: AnimeDetailProps) {
       <div className="relative h-[70vh] w-full">
         <div className="absolute inset-0">
           <img
-            src={anime.backdropImage || anime.image}
+            src={anime.backdropImage || anime.image || 'https://via.placeholder.com/150'}
             alt={anime.title}
             className="w-full h-full object-cover"
           />
@@ -156,33 +183,56 @@ export default function AnimeDetail({ anime }: AnimeDetailProps) {
                     {/* Episodes List */}
                     {selectedSeason === season.id && season.episodes && (
                       <div className="border-t border-gray-800">
-                        {season.episodes.map((episode) => (
-                          <div
-                            key={episode.id}
-                            className="px-6 py-4 border-b border-gray-800 last:border-b-0 hover:bg-gray-800 transition-colors cursor-pointer group"
-                          >
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h4 className="text-white font-medium group-hover:text-red-500 transition-colors">
-                                  Episode {episode.episodeNumber}
-                                </h4>
-                                <p className="text-sm text-gray-400 mt-1">
-                                  {episode.name}
-                                </p>
+                        {season.episodes.map((episode) => {
+                          const episodeLinks = links?.episodes.find(
+                            e => e.episodeNumber === episode.episodeNumber
+                          );
+
+                          return (
+                            <div
+                              key={episode.id}
+                              className="px-6 py-4 border-b border-gray-800 last:border-b-0 hover:bg-gray-800 transition-colors"
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-grow">
+                                  <h4 className="text-white font-medium group-hover:text-red-500 transition-colors">
+                                    Episode {episode.episodeNumber}
+                                  </h4>
+                                  <p className="text-sm text-gray-400 mt-1">
+                                    {episode.name}
+                                  </p>
+                                </div>
+                                {episode.runtime && (
+                                  <span className="text-sm text-gray-400">
+                                    {episode.runtime} min
+                                  </span>
+                                )}
                               </div>
-                              {episode.runtime && (
-                                <span className="text-sm text-gray-400">
-                                  {episode.runtime} min
-                                </span>
+                              {episode.overview && (
+                                <p className="text-sm text-gray-300 mt-2">
+                                  {episode.overview}
+                                </p>
+                              )}
+                              
+                              {/* Video Links */}
+                              {episodeLinks && episodeLinks.links.length > 0 && (
+                                <div className="mt-4">
+                                  <div className="flex flex-wrap gap-2">
+                                    {episodeLinks.links.map((link, index) => (
+                                      <button
+                                        key={index}
+                                        onClick={() => setSelectedVideo(link.url)}
+                                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                                      >
+                                        {link.hoster}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
                               )}
                             </div>
-                            {episode.overview && (
-                              <p className="text-sm text-gray-300 mt-2">
-                                {episode.overview}
-                              </p>
-                            )}
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -192,23 +242,20 @@ export default function AnimeDetail({ anime }: AnimeDetailProps) {
         )}
       </div>
 
+      {/* Video Modal */}
+      {selectedVideo && (
+        <VideoModal
+          url={selectedVideo}
+          onClose={() => setSelectedVideo(null)}
+        />
+      )}
+
       {/* Trailer Modal */}
       {showTrailer && anime.trailerKey && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-5xl aspect-video">
-            <button
-              onClick={() => setShowTrailer(false)}
-              className="absolute -top-10 right-0 text-white hover:text-gray-300"
-            >
-              Fermer
-            </button>
-            <iframe
-              src={`https://www.youtube.com/embed/${anime.trailerKey}`}
-              className="w-full h-full"
-              allowFullScreen
-            />
-          </div>
-        </div>
+        <VideoModal
+          url={`https://www.youtube.com/embed/${anime.trailerKey}`}
+          onClose={() => setShowTrailer(false)}
+        />
       )}
     </div>
   );
