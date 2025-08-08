@@ -127,9 +127,9 @@ export default function LoginForm() {
               </button>
 
               <p className="text-center text-sm text-gray-400">
-                Vous n'avez pas de compte ?{' '}
+                Vous n&apos;avez pas de compte ?{' '}
                 <Link href="/register" className="text-red-500 hover:text-red-400 font-medium">
-                  S'inscrire
+                  S&apos;inscrire
                 </Link>
               </p>
             </form>

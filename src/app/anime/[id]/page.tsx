@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { getAnimeDetails } from '@/services/tmdb'
+import { getAnimeDetailsServer } from '@/services/animeServiceServer'
 import AnimeDetail from '@/components/AnimeDetail'
 import { notFound } from 'next/navigation'
 
@@ -9,7 +10,14 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const anime = await getAnimeDetails(parseInt(params.id))
+    const anime = await getAnimeDetailsServer(parseInt(params.id))
+    
+    if (!anime) {
+      return {
+        title: 'Anime non trouvé',
+        description: 'Cet anime n\'est pas disponible sur AnimeFlow.'
+      }
+    }
     
     const title = `${anime.title} - Regarder en Streaming`
     const description = anime.overview || `Regardez ${anime.title} en streaming HD sur AnimeFlow. Découvrez tous les épisodes de cet anime en VOSTFR.`
@@ -21,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title,
         description,
         type: 'video.episode',
-        images: [anime.backdropImage || anime.image].filter(Boolean),
+        images: anime.backdropImage || anime.image || undefined,
         videos: anime.trailerKey ? [{
           url: `https://www.youtube.com/watch?v=${anime.trailerKey}`,
           type: 'text/html',
@@ -31,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         card: 'summary_large_image',
         title,
         description,
-        images: [anime.backdropImage || anime.image].filter(Boolean),
+        images: anime.backdropImage || anime.image || undefined,
       },
     }
   } catch (error) {
@@ -43,7 +51,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function AnimePage({ params }: Props) {
   try {
-    const anime = await getAnimeDetails(parseInt(params.id))
+    const anime = await getAnimeDetailsServer(parseInt(params.id))
+    
+    if (!anime) {
+      notFound()
+    }
+    
     return <AnimeDetail anime={anime} />
   } catch (error) {
     notFound()

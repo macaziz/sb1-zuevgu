@@ -1,19 +1,11 @@
 import { 
-  getTrendingAnime, 
-  getTopRatedAnime, 
-  getAnimeByGenre, 
-  getNewReleases 
-} from '@/lib/tmdb';
+  getTrendingAnimeServer, 
+  getTopRatedAnimeServer, 
+  getAnimeByGenreServer, 
+  getNewReleasesServer 
+} from '@/services/animeServiceServer';
 import Carousel from '@/components/Carousel';
 import AnimeRow from '@/components/AnimeRow';
-
-// Genre IDs from TMDB that are commonly used for anime
-const ACTION_ID = 28;
-const ADVENTURE_ID = 12;
-const FANTASY_ID = 14;
-const COMEDY_ID = 35;
-const DRAMA_ID = 18;
-const SCIFI_ID = 878;
 
 export default async function Home() {
   const [
@@ -27,15 +19,15 @@ export default async function Home() {
     dramaAnimes,
     scifiAnimes
   ] = await Promise.all([
-    getTrendingAnime(),
-    getTopRatedAnime(),
-    getNewReleases(),
-    getAnimeByGenre(ACTION_ID),
-    getAnimeByGenre(ADVENTURE_ID),
-    getAnimeByGenre(FANTASY_ID),
-    getAnimeByGenre(COMEDY_ID),
-    getAnimeByGenre(DRAMA_ID),
-    getAnimeByGenre(SCIFI_ID)
+    getTrendingAnimeServer(),
+    getTopRatedAnimeServer(),
+    getNewReleasesServer(),
+    getAnimeByGenreServer('Action'),
+    getAnimeByGenreServer('Adventure'),
+    getAnimeByGenreServer('Fantasy'),
+    getAnimeByGenreServer('Comedy'),
+    getAnimeByGenreServer('Drama'),
+    getAnimeByGenreServer('Sci-Fi')
   ]);
 
   return (

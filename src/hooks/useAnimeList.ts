@@ -5,7 +5,7 @@ import { Anime } from '@/types/tmdb';
 interface UseAnimeListParams {
   genres?: number[];
   year?: number;
-  sortBy?: string;
+  sortBy?: 'score' | 'popularity' | 'title' | 'episodes' | 'year';
   sortDirection?: 'asc' | 'desc';
 }
 
@@ -29,8 +29,7 @@ export function useAnimeList({
         page: pageNumber,
         genres,
         year,
-        sortBy,
-        sortDirection
+        sortBy
       });
       
       if (pageNumber === 1) {
@@ -39,7 +38,7 @@ export function useAnimeList({
         setAnimes(prev => [...prev, ...data.results]);
       }
       
-      setHasMore(data.page < data.totalPages);
+      setHasMore(data.page < data.total_pages);
     } catch (err) {
       setError('Failed to fetch animes');
     } finally {

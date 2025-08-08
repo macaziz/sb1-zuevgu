@@ -20,7 +20,8 @@ function transformAnimeResponse(data: any): Anime {
     image: data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : null,
     backdropImage: data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : null,
     rating: data.vote_average,
-    genres: data.genres?.map((g: any) => g.name) || data.genre_ids || [],
+    genres: data.genres?.map((g: any) => g.name) || [],
+    genreIds: data.genre_ids || [],
     releaseYear: new Date(data.first_air_date || data.release_date).getFullYear(),
     overview: data.overview,
   };

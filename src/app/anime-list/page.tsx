@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import AnimeListClient from '@/components/AnimeListClient'
-import { getGenres } from '@/services/tmdb'
+import { getGenresServer } from '@/services/animeServiceServer'
 
 export const metadata: Metadata = {
   title: 'Liste des Animes',
@@ -12,6 +12,6 @@ export const metadata: Metadata = {
 }
 
 export default async function AnimeListPage() {
-  const genres = await getGenres()
+  const genres = await getGenresServer()
   return <AnimeListClient initialGenres={genres} />
 }

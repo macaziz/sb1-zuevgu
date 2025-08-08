@@ -19,7 +19,7 @@ export default function AnimeListClient({ initialGenres }: AnimeListClientProps)
   const [hasMore, setHasMore] = useState(true);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | undefined>();
-  const [sortBy, setSortBy] = useState('popularity.desc');
+  const [sortBy, setSortBy] = useState<'score' | 'popularity' | 'title' | 'episodes' | 'year'>('popularity');
 
   const { ref, inView } = useInView({
     threshold: 0,
@@ -41,7 +41,7 @@ export default function AnimeListClient({ initialGenres }: AnimeListClientProps)
         setAnimes(prev => [...prev, ...data.results]);
       }
       
-      setHasMore(data.page < data.totalPages);
+      setHasMore(data.page < data.total_pages);
       setPage(pageNum);
     } catch (err) {
       setError('Une erreur est survenue lors du chargement des animes');
@@ -118,13 +118,14 @@ export default function AnimeListClient({ initialGenres }: AnimeListClientProps)
             {/* Sort */}
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => setSortBy(e.target.value as 'score' | 'popularity' | 'title' | 'episodes' | 'year')}
               className="bg-gray-800 text-white rounded-md px-3 py-1"
             >
-              <option value="popularity.desc">Popularité</option>
-              <option value="vote_average.desc">Note</option>
-              <option value="first_air_date.desc">Date de sortie</option>
-              <option value="name.asc">Titre</option>
+              <option value="popularity">Popularité</option>
+              <option value="score">Note</option>
+              <option value="year">Date de sortie</option>
+              <option value="title">Titre</option>
+              <option value="episodes">Nombre d'épisodes</option>
             </select>
           </div>
         </div>

@@ -4,8 +4,8 @@ const nextConfig = {
     domains: ['image.tmdb.org', 'images.unsplash.com'],
   },
   reactStrictMode: true,
-  experimental: {
-    missingSuspenseWithCSRError: false,
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 }
 

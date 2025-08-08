@@ -77,7 +77,8 @@ export function useAnimeSearch(query: string) {
       setError(null);
       try {
         const data = await searchAnime(query);
-        setResults(data);
+        // La nouvelle API retourne un objet avec results, pas directement un tableau
+        setResults(data.results || []);
       } catch (err) {
         setError('Failed to search anime');
       } finally {
@@ -117,7 +118,7 @@ export function useTopRatedAnime() {
   return { animes, isLoading, error };
 }
 
-export function useAnimeByGenre(genreId: number) {
+export function useAnimeByGenre(genreName: string) {
   const [animes, setAnimes] = useState<Anime[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +128,7 @@ export function useAnimeByGenre(genreId: number) {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await getAnimeByGenre(genreId);
+        const data = await getAnimeByGenre(genreName);
         setAnimes(data);
       } catch (err) {
         setError('Failed to fetch anime by genre');
@@ -136,8 +137,10 @@ export function useAnimeByGenre(genreId: number) {
       }
     };
 
-    fetchByGenre();
-  }, [genreId]);
+    if (genreName) {
+      fetchByGenre();
+    }
+  }, [genreName]);
 
   return { animes, isLoading, error };
 }

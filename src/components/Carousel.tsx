@@ -45,7 +45,7 @@ export default function Carousel({ animes }: CarouselProps) {
         }}
       >
         <img
-          src={currentAnime.backdropImage || currentAnime.image}
+          src={currentAnime.backdropImage || currentAnime.image || ''}
           alt={currentAnime.title}
           className="w-full h-full object-cover"
         />

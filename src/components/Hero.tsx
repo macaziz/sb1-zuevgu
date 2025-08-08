@@ -1,6 +1,6 @@
 import React from 'react';
 import { Play, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Anime } from '../types/tmdb';
 import WatchlistButton from './WatchlistButton';
 
@@ -13,7 +13,7 @@ export default function Hero({ anime }: HeroProps) {
     <div className="relative h-[90vh] w-full">
       <div className="absolute inset-0">
         <img
-          src={anime.backdropImage || anime.image}
+          src={anime.backdropImage || anime.image || ''}
           alt={anime.title}
           className="w-full h-full object-cover"
         />
@@ -35,7 +35,7 @@ export default function Hero({ anime }: HeroProps) {
           
           <div className="flex space-x-4">
             <Link
-              to={`/anime/${anime.id}`}
+              href={`/anime/${anime.id}`}
               className="flex items-center px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
             >
               <Play className="w-5 h-5 mr-2" />
